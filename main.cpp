@@ -1,7 +1,8 @@
 #include <experimental/coroutine>
 #include <iostream>
+#include <string>
 
-namespace exp = std::experimental;
+using namespace std::experimental;
 using namespace std;
 
 thread_local int t_level;
@@ -22,11 +23,14 @@ struct[[nodiscard]] logged_scope {
 
 #define LOGGED_DEFAULT_CONSTRUCTOR(C) \
   C() { logged_scope s("Create " #C); }
+#define LOGGED_COPY_CONSTRUCTOR(C) \
+  C(C const&) { logged_scope s("Copy " #C); }
 #define LOGGED_DESTRUCTOR(C) \
   ~C() { logged_scope s("Destroy " #C); }
 
 struct test {
   LOGGED_DEFAULT_CONSTRUCTOR(test)
+  LOGGED_COPY_CONSTRUCTOR(test)
   LOGGED_DESTRUCTOR(test)
 
   struct promise_type {
@@ -48,16 +52,16 @@ struct test {
     }
     auto initial_suspend() {
       logged_scope s("initial_suspend");
-      return exp::suspend_never{};
+      return suspend_never{};
     }
     auto yield_value(int) {
       logged_scope s("yield_value");
-      return exp::suspend_never{};
+      return suspend_never{};
     }
     auto return_void() { logged_scope s("return_void"); }
     auto final_suspend() {
       logged_scope s("final_suspend");
-      return exp::suspend_never{};
+      return suspend_never{};
     }
   };
 };
