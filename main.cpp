@@ -66,6 +66,7 @@ struct test {
       return suspend_always{};
     }
     auto return_void() { logged_scope s("return_void"); }
+    auto unhandled_exception() { logged_scope s("unhandled_exception"); }
     auto final_suspend() {
       logged_scope s("final_suspend");
       return suspend_never{};
